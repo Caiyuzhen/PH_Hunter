@@ -15,26 +15,22 @@ app = Flask(__name__)
 
 # 定义 GraphQL 查询
 query = gql('''
-query todayPosts {
-	posts(first: 15, order: VOTES) {
-		edges {
-			node {
-				id
-				name
-				tagline
-				votesCount
-				url
-                thumbnail {
+	query todayPosts {
+		posts {
+			edges {
+				node {
+					name
+					description
+					votesCount
 					url
-				}
-				media {
-					type
-					url
+					media {
+						type
+						url
+					}
 				}
 			}
 		}
 	}
-}
 ''')
 
 
@@ -56,14 +52,27 @@ def queryPH_everyDay():
 	# 执行查询
 	response = client.execute(query)
  
- 	# 从【查询结果】内提取一篇帖子
-	posts_deges = response['posts']['edges']
+ 	# 从【查询结果】内提取帖子主体
+	posts_edges = response['posts']['edges']
  
      # 如果帖子列表不为空，随机选择一篇帖子
-	if posts_deges:
-		random_post = random.choice(posts_deges)['node']
+	if posts_edges:
+		# 返回全部 post
+		# return response
+
+		# 随机选择三篇 post 返回
+		num_posts = min(3, len(posts_edges))
+  
+		# 随机选择 num_posts 篇帖子
+		selected_posts = random.sample(posts_edges, num_posts)
+  
+		# 更新响应结构以仅包含选定的帖子
+		response['posts']['edges'] = selected_posts
+
+		# 随机选择一篇 post 返回
+		# random_post = random.choice(posts_deges)['node']
 		# 将随机选中的帖子包装在相同的结构中返回
-		response['posts']['edges'] = [{'node': random_post}]
+		# response['posts']['edges'] = [{'node': random_post}]
 	else:
 		# 如果没有帖子，确保返回的结构是空的
 		response['posts']['edges'] = []

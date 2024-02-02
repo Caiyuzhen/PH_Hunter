@@ -16,7 +16,7 @@ app = Flask(__name__)
 # 定义 GraphQL 查询
 query = gql('''
 	query todayPosts {
-		posts {
+		posts(order: FEATURED_AT, featured: true, topic: "artificial-intelligence") {
 			edges {
 				node {
 					name
